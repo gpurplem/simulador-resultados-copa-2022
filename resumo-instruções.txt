@@ -1,0 +1,35 @@
+[O que usar]:
+
+>HTML, CSS, JS
+
+>Pode usar frameworks
+
+>Chamar API - header git-user (nome usuário GitHub)
+
+[O que fazer]:
+
+1. Pegar as 32 seleções da API (GET, JSON).
+
+2. Random: 8 grupos de 4 (A-H).
+
+2.1. Exibir grupos.
+
+3. Random: 3 rodadas com 2 partidas cada. Times organizados por combinação sem repetição.
+
+3.1. Exibir partidas e resultados. Atributos do objeto "seleção": qtd gols, qtd gols de pênalti, qtd de pontos (step 4).
+
+3.4. Lógica dos pontos por pênalti:
+-empate de gols
+-cada time chuta 5x
+-ganha primeiro time que tiver pênaltis que o adversário não consiga igualar ou superar considerando a qtd de chutes que ainda possui
+-se ambos atingirem 5 gols, começa o "morte súbita". O primeiro time que não acertar o gol, perde.
+
+4. Contabilizar: 3*vitórias + 1*empates.
+
+5. Classificar apenas 2 de cada grupo.
+
+5.1. Desempatar: numero pontos > saldo de gols > qtd de gols de pênalti.
+
+6. Iterar passos anteriores até a Final.
+
+7. Enviar resultado da final pra API (POST, JSON).
