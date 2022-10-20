@@ -13,6 +13,15 @@
     font-family: sans-serif;
 }
 
+html{
+    position:relative; 
+    min-height: 100%;
+}
+
+.page_container {
+    margin-bottom:100px;
+}
+
 h1 {
     font-size: 24px;
 }
@@ -69,9 +78,25 @@ Sobre
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-items: center;
+    justify-content: center;
     width: 30%;
     gap: 2rem;
     color: var(--color-darktext);
     font-size: large;
+}
+
+/*============================
+Footer
+============================*/
+
+footer{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height:4vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-lighttext);
 }
