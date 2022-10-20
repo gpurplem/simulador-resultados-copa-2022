@@ -3,14 +3,13 @@ Geral
 ============================*/
 
 :root {
-    --color-sand0: #fff2df;
-    --color-sand1: #fbefcc;
-    --color-sand2: #f9ccac;
-    --color-sand3: #f4a688;
-    --color-sand4: #e0876a;
-    --color-sand6: #c54920;
-    --color-sand7: #a72e05;
-    --color-sand5: rgb(83, 46, 8);
+    --color0: #f2f7f9;
+    --color1: #bcd5e1;
+    --color2: #bccad6;
+    --color3: #8d9db6;
+    --color4: #667292;
+    --color5: #39466a;
+    --color6: #f1e3dd;
 
     --border-radius: 2rem;
 }
@@ -24,7 +23,7 @@ Geral
 }
 
 body {
-    background-color: var(--color-sand0);
+    background-color: var(--color0);
     height: 100vh;
     display: grid;
 }
@@ -45,7 +44,7 @@ Nav
 nav {
     width: 100vw;
     height: 4vw;
-    background: var(--color-sand3);
+    background: var(--color5);
 }
 
 .nav {
@@ -60,11 +59,11 @@ nav {
 nav a {
     text-decoration: none;
     cursor: pointer;
-    color: var(--color-sand4)
+    color: var(--color2)
 }
 
 nav a:hover {
-    color: white;
+    color: rgb(255, 255, 255);
 }
 
 /*============================
@@ -76,8 +75,8 @@ footer {
     margin-top: auto;
     width: 100vw;
     height: 4vw;
-    background: var(--color-sand3);
-    color: var(--color-sand0);
+    background: var(--color5);
+    color: var(--color2);
 }
 
 .footer {
@@ -106,12 +105,16 @@ Main Sobre
     justify-content: center;
     width: 30%;
     gap: 2rem;
-    color: var(--color-sand4);
+    color: var(--color6);
     font-size: large;
 }
 
-.sobre_body_inner h1, h2 {
-    color: var(--color-sand7);
+.sobre_body_inner h1 {
+    color: var(--color4);
+}
+
+.sobre_body_inner h2 {
+    color: var(--color3);
 }
 
 /*============================
@@ -122,6 +125,6 @@ Main Index
     padding: 1rem;
     border: none;
     border-radius: var(--border-radius);
-    background-color: var(--color-sand4);
-    color: var(--color-sand0);
+    background-color: var(--color4);
+    color: var(--color6);
 }
