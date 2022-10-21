@@ -66,6 +66,11 @@ nav a:hover {
     color: rgb(255, 255, 255);
 }
 
+.btn-nav {
+    padding: 0.4rem!important;
+    color: var(--color6)!important;
+}
+
 /*============================
 Footer
 ============================*/
@@ -95,7 +100,7 @@ Main Sobre
     height: 82vh;
     display: grid;
     justify-items: center;
-    overflow: hidden;
+    overflow: scroll;
 }
 
 .main_body_inner {
@@ -129,6 +134,16 @@ Main Index
     color: var(--color6);
 }
 
-.index_main_body_inner {
-    color: aqua;
+.index_main_body_inner1 {
+    color: var(--color5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.table1, .table1 th, .table1 td  {
+    text-align: center;
+    border:1px solid black;
+    padding: 3px;
 }

@@ -51,7 +51,36 @@ async function getSelecoes(url) {
 }
 
 async function mostrarSelecoes() {
-    dadosHtml = "<table><tr><th>Seleção</th><th>Gols</th><th>Pênaltis</th><th>Pontuação</th></tr>'";
+    dadosHtml = "<table class='table1'>" + 
+    "<tr><th colspan='4'>Seleções</th></tr>";
+
+    for(let i = 0; i<32; i++){
+        dadosHtml += '<tr>' + '<td>' + selecoesArray[i]['Name'] + '</td>' + '<td>' + selecoesArray[++i]['Name'] + '</td>' 
+        + '<td>' + selecoesArray[++i]['Name'] + '</td>' + '<td>' + selecoesArray[++i]['Name'] + '</td>' + '</tr>';
+    }
+    dadosHtml += "</table>";
+
+    document.getElementById("main_body").innerHTML = dadosHtml;
+    document.getElementById("nav-top").innerHTML  += "<button class='btn btn-nav'>AVANÇAR</button>";
+}
+
+var iniciarBtn = document.getElementById("iniciar-btn");
+
+async function iniciar() {
+    iniciarBtn.remove();
+    document.getElementById("main_body").className = "index_main_body_inner1";
+    await getSelecoes(apiUrl);
+    await mostrarSelecoes();
+};
+
+iniciarBtn.addEventListener('click', iniciar);
+
+
+
+
+/*async function mostrarSelecoes() {
+    dadosHtml = "<h2 style='text-align: center'>Seleções e placar inicial</h2><table class='table1'>" + 
+    "<tr><th>Seleção</th><th>Gols</th><th>Pênaltis</th><th>Pontuação</th></tr>";
 
     for(let i = 0; i<32; i++){
         let pais = selecoesArray[i]['Name'];
@@ -65,16 +94,5 @@ async function mostrarSelecoes() {
     dadosHtml += "</table>";
 
     document.getElementById("main_body").innerHTML = dadosHtml;
-}
-
-var iniciarBtn = document.getElementById("iniciar-btn");
-
-async function iniciar() {
-    iniciarBtn.remove();
-    document.getElementById("main_body").className = "index_main_body_inner";
-    await getSelecoes(apiUrl);
-    await mostrarSelecoes();
-};
-
-iniciarBtn.addEventListener('click', iniciar);
-
+    document.getElementById("nav-top").innerHTML  += "<button class='btn btn-nav'>AVANÇAR</button>";
+}*/
