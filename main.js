@@ -89,7 +89,7 @@ function modBtnAvancar(funcao) {
     }
 }
 
-function situacaoAtualizadas(){
+function situacaoAtualizada(){
     let dadosHtml = "";
     const grupo = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
@@ -139,7 +139,7 @@ function mostrarSelecoesAH(){
 
     document.getElementById('table1').remove();
 
-    dadosHtml = situacaoAtualizadas();
+    dadosHtml = situacaoAtualizada();
      
     document.getElementById('main_container').className = 'main_body_outer2';
     document.getElementById('main_body').className = 'index_main_body_inner2';
@@ -157,36 +157,59 @@ function FisherYatesShuffle(array){
       }
 }
 
+function gerarInt09(){
+    return Math.floor(Math.random() * 10);
+}
+
+function gerarGols(time1, time2){
+    while(time1<32 && time2<32){
+        selecoesArray[time1].QtdGols += gerarInt09();
+        selecoesArray[time2].QtdGols += gerarInt09();
+        time1+=4;
+        time2+=4;
+    }
+}
+
 function rodada1(){
     document.getElementById('main_body').className = 'rodada1';
     modBtnAvancar("rodada2");
-
-    
+    gerarGols(0, 1);
+    document.getElementById("main_body").innerHTML = situacaoAtualizada();
 }
 
 function rodada2(){
     document.getElementById('main_body').className = 'rodada2';
     modBtnAvancar("rodada3");
+    gerarGols(0, 2);
+    document.getElementById("main_body").innerHTML = situacaoAtualizada();
 }
 
 function rodada3(){
     document.getElementById('main_body').className = 'rodada3';
     modBtnAvancar("rodada4");
+    gerarGols(0, 3);
+    document.getElementById("main_body").innerHTML = situacaoAtualizada();
 }
 
 function rodada4(){
     document.getElementById('main_body').className = 'rodada4';
     modBtnAvancar("rodada5");
+    gerarGols(1, 2);
+    document.getElementById("main_body").innerHTML = situacaoAtualizada();
 }
 
 function rodada5(){
     document.getElementById('main_body').className = 'rodada5';
     modBtnAvancar("rodada6");
+    gerarGols(1, 3);
+    document.getElementById("main_body").innerHTML = situacaoAtualizada();
 }
 
 function rodada6(){
     document.getElementById('main_body').className = 'rodada6';
     modBtnAvancar("oitava1");
+    gerarGols(2, 3);
+    document.getElementById("main_body").innerHTML = situacaoAtualizada();
 }
 
 
