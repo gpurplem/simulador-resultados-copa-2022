@@ -78,25 +78,25 @@ async function mostrarSelecoes() {
 
 function modBtnAvancar(funcao) {
     const btn = document.getElementById("avancar-btn");
-    
-    if(btn == null){
+
+    if (btn == null) {
         document.getElementById("nav-top").innerHTML +=
-        `<button class='btn btn-nav' id='avancar-btn' onclick='${funcao}()'>AVANÇAR</button>`;
+            `<button class='btn btn-nav' id='avancar-btn' onclick='${funcao}()'>AVANÇAR</button>`;
     } else {
         btn.remove();
         document.getElementById("nav-top").innerHTML +=
-        `<button class='btn btn-nav' id='avancar-btn' onclick='${funcao}()'>AVANÇAR</button>`;
+            `<button class='btn btn-nav' id='avancar-btn' onclick='${funcao}()'>AVANÇAR</button>`;
     }
 }
 
-function situacaoAtualizada(){
+function situacaoAtualizada() {
     let dadosHtml = "";
     const grupo = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
     //Mod HTML: mostrar as seleções em grupos      
-    for (let i = 0, j=0; i < 32; i++) {
+    for (let i = 0, j = 0; i < 32; i++) {
         dadosHtml +=
-        `<table class='table1' id='table2'>
+            `<table class='table1' id='table2'>
             <tr>
                 <th>${grupo[j++]}</th>
                 <th>Gol</th>
@@ -132,7 +132,7 @@ function situacaoAtualizada(){
     return dadosHtml;
 }
 
-function mostrarSelecoesAH(){
+function mostrarSelecoesAH() {
     let dadosHtml = "";
     //const grupo = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
     FisherYatesShuffle(selecoesArray);
@@ -140,7 +140,7 @@ function mostrarSelecoesAH(){
     document.getElementById('table1').remove();
 
     dadosHtml = situacaoAtualizada();
-     
+
     document.getElementById('main_container').className = 'main_body_outer2';
     document.getElementById('main_body').className = 'index_main_body_inner2';
     document.getElementById("main_body").innerHTML = dadosHtml;
@@ -149,63 +149,106 @@ function mostrarSelecoesAH(){
     modBtnAvancar("rodada1");
 }
 
-function FisherYatesShuffle(array){
+function FisherYatesShuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
         let j = Math.floor(Math.random() * (i + 1)); //Gera de 0 a i
 
         [array[i], array[j]] = [array[j], array[i]];
-      }
-}
-
-function gerarInt09(){
-    return Math.floor(Math.random() * 10);
-}
-
-function gerarGols(time1, time2){
-    while(time1<32 && time2<32){
-        selecoesArray[time1].QtdGols += gerarInt09();
-        selecoesArray[time2].QtdGols += gerarInt09();
-        time1+=4;
-        time2+=4;
     }
 }
 
-function rodada1(){
+function gerarInt09() {
+    return Math.floor(Math.random() * 10);
+}
+
+function gerarPenalti(time1, time2) {
+    let p1 = 0;
+    let p2 = 0;
+
+    for (let i = 0; i < 5; i++) {
+        p1 += Math.round(Math.random());
+        p2 += Math.round(Math.random());
+
+        //Checar se algum time já ganhou (mesmo que oponente acerte as tentativas restantes)
+        p1jaganhou = p1 > (p2 + (4 - i));
+        p2jaganhou = p2 > (p1 + (4 - i));
+
+        if ((p1jaganhou && !p2jaganhou) || (!p1jaganhou && p2jaganhou)) {
+            break;
+        }
+    }
+
+    //Verificar se precisa de "perda-súbita"
+    while (p1 === p2) {
+        p1 += Math.round(Math.random());
+        p2 += Math.round(Math.random());
+    }
+
+    selecoesArray[time1].QtdGolsPenalti += p1;
+    selecoesArray[time2].QtdGolsPenalti += p2;
+}
+
+function gerarGols(time1, time2) {
+    let qtd1 = 0;
+    let qtd2 = 0;
+
+    while (time1 < 32 && time2 < 32) {
+        //Vetor guarda gols anteriores
+        selecoesArray[time1].QtdGols += gerarInt09();
+        selecoesArray[time2].QtdGols += gerarInt09();
+
+        //Verificar se NESTA partida será preciso pênalti
+        qtd1 += selecoesArray[time1].QtdGols;
+        qtd2 += selecoesArray[time2].QtdGols;
+
+        //Verificar necessidade de pênalti
+        if (qtd1 === qtd2) {
+            gerarPenalti(time1, time2);
+        }
+
+        time1 += 4;
+        time2 += 4;
+        qtd1 = 0;
+        qtd2 = 0;
+    }
+}
+
+function rodada1() {
     document.getElementById('main_body').className = 'rodada1';
     modBtnAvancar("rodada2");
     gerarGols(0, 1);
     document.getElementById("main_body").innerHTML = situacaoAtualizada();
 }
 
-function rodada2(){
+function rodada2() {
     document.getElementById('main_body').className = 'rodada2';
     modBtnAvancar("rodada3");
     gerarGols(0, 2);
     document.getElementById("main_body").innerHTML = situacaoAtualizada();
 }
 
-function rodada3(){
+function rodada3() {
     document.getElementById('main_body').className = 'rodada3';
     modBtnAvancar("rodada4");
     gerarGols(0, 3);
     document.getElementById("main_body").innerHTML = situacaoAtualizada();
 }
 
-function rodada4(){
+function rodada4() {
     document.getElementById('main_body').className = 'rodada4';
     modBtnAvancar("rodada5");
     gerarGols(1, 2);
     document.getElementById("main_body").innerHTML = situacaoAtualizada();
 }
 
-function rodada5(){
+function rodada5() {
     document.getElementById('main_body').className = 'rodada5';
     modBtnAvancar("rodada6");
     gerarGols(1, 3);
     document.getElementById("main_body").innerHTML = situacaoAtualizada();
 }
 
-function rodada6(){
+function rodada6() {
     document.getElementById('main_body').className = 'rodada6';
     modBtnAvancar("oitava1");
     gerarGols(2, 3);
