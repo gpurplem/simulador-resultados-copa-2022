@@ -1,30 +1,6 @@
 /*============================
-Mudar fonte de nav dependendo da página.
+Classes e estruturas globais.
 ============================*/
-
-var nomePagina = window.location.pathname;
-var nomePagina = nomePagina.split("/").pop(); //Pega o último elemento do vetor.
-
-if(nomePagina === "index.html"){
-    var elem_inicio = document.getElementById("inicio");
-    elem_inicio.style.color = "white";
-} else if(nomePagina === "sobre.html"){
-    var elem_sobre = document.getElementById("sobre");
-    elem_sobre.style.color = "white";
-}
-
-/*============================
-Botão iniciar.
-============================*/
-/*============================
-Mostrar seleções (passo 1).
-============================*/
-
-const apiUrl = "https://estagio.geopostenergy.com/WorldCup/GetAllTeams";
-var dados;
-var selecoesArray = new Array(32);
-var dadosHtml = "";
-
 class selecaoObj {
     constructor(Name, Token) {
         this.Name = Name;
@@ -35,54 +11,151 @@ class selecaoObj {
     }
 }
 
-async function getSelecoes(url) {
-    
-    const resposta = await fetch(url, 
-        {
-            method: 'GET', headers: {'git-user': 'gpurplem'},
-            response: 'JSON' 
-        });
-    
-        dados = await resposta.json();
-
-        for(let i = 0; i<32; i++){
-            selecoesArray[i] = new selecaoObj(dados.Result[i].Name, dados.Result[i].Token);
-        }
-}
-
-async function mostrarSelecoes() {
-    dadosHtml = "<table class='table1'>" + 
-    "<tr><th colspan='4'>Seleções</th></tr>";
-
-    for(let i = 0; i<32; i++){
-        dadosHtml += '<tr>' + '<td>' + selecoesArray[i]['Name'] + '</td>' + '<td>' + selecoesArray[++i]['Name'] + '</td>' 
-        + '<td>' + selecoesArray[++i]['Name'] + '</td>' + '<td>' + selecoesArray[++i]['Name'] + '</td>' + '</tr>';
-    }
-    dadosHtml += "</table>";
-
-    document.getElementById("main_body").innerHTML = dadosHtml;
-    document.getElementById("nav-top").innerHTML  += "<button class='btn btn-nav' id='avancar-btn'>AVANÇAR</button>";
-    avancarBtn = document.getElementById("avancar-btn");
-}
-
-var iniciarBtn = document.getElementById("iniciar-btn");
-
-async function iniciar() {
-    iniciarBtn.remove();
-    document.getElementById("main_body").className = "index_main_body_inner1";
-    await getSelecoes(apiUrl);
-    await mostrarSelecoes();
-};
-
-iniciarBtn.addEventListener('click', iniciar);
+let selecoesArray = new Array(32);
+let controleBtnAvancar = 0;
 
 /*============================
-Mostrar seleções agrupadas após sorteio: 8 grupos de 4 (passo 2).
+Ordem de execução
 ============================*/
+function iniciarPrograma() {
+    document.getElementById("iniciar-btn").remove();
+    document.getElementById("main_body").className = "index_main_body_inner1"; //Muda classe da div main_body_inner.
+    mostrarSelecoes();
+    exibirBtnAvancar();
+}
 
-var avancarBtn;
+/*
+Ordem do botão avançar:
+1. mostrarSelecoesAH()
+2.
+*/
 
-avancarBtn.addEventListener("click", alert);
+/*============================
+Funções
+============================*/
+async function mostrarSelecoes() {
+    const apiUrl = "https://estagio.geopostenergy.com/WorldCup/GetAllTeams";
+    let dadosHtml = "";
+    let dados;
+
+    //Get dados da API
+    const resposta = await fetch(apiUrl,
+        {
+            method: 'GET', headers: { 'git-user': 'gpurplem' },
+            response: 'JSON'
+        });
+
+    dados = await resposta.json();
+
+    //Load vetor de seleções.
+    for (let i = 0; i < 32; i++) {
+        selecoesArray[i] = new selecaoObj(dados.Result[i].Name, dados.Result[i].Token);
+    }
+
+    //Mod HTML: mostrar as seleções em uma tabela
+    dadosHtml =
+        `<table class='table1' id='table1'>
+        <tr>
+            <th colspan='4'>Seleções</th>
+        </tr>`;
+
+    for (let i = 0; i < 32; i++) {
+        dadosHtml +=
+            `<tr>
+            <td>${selecoesArray[i]['Name']}</td>
+            <td>${selecoesArray[++i]['Name']}</td>
+            <td>${selecoesArray[++i]['Name']}</td>
+            <td>${selecoesArray[++i]['Name']}</td>
+        </tr>`;
+    }
+
+    dadosHtml +=
+        `</table>`;
+
+    document.getElementById("main_body").innerHTML = dadosHtml;
+}
+
+function exibirBtnAvancar() {
+    document.getElementById("nav-top").innerHTML +=
+    `<button class='btn btn-nav' id='avancar-btn' onclick='mostrarSelecoesAH()'>AVANÇAR</button>`;
+}
+
+function mostrarSelecoesAH(){
+    let dadosHtml = "";
+    const grupo = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+    FisherYatesShuffle(selecoesArray);
+
+    document.getElementById('table1').remove();
+
+    //Mod HTML: mostrar as seleções em grupos      
+    for (let i = 0, j=0; i < 32; i++) {
+        dadosHtml +=
+        `<table class='table1' id='table2'>
+            <tr>
+                <th colspan='4'>${grupo[j++]}</th>
+            </tr>            
+            <tr>
+                <td>${selecoesArray[i]['Name']}</td>
+                <td>${selecoesArray[i]['QtdGols']}</td>
+                <td>${selecoesArray[i]['QtdGolsPenalti']}</td>
+                <td>${selecoesArray[i]['Pontuacao']}</td>
+            </tr>
+            <tr>
+                <td>${selecoesArray[++i]['Name']}</td>
+                <td>${selecoesArray[i]['QtdGols']}</td>
+                <td>${selecoesArray[i]['QtdGolsPenalti']}</td>
+                <td>${selecoesArray[i]['Pontuacao']}</td>
+            </tr>
+            <tr>
+                <td>${selecoesArray[++i]['Name']}</td>
+                <td>${selecoesArray[i]['QtdGols']}</td>
+                <td>${selecoesArray[i]['QtdGolsPenalti']}</td>
+                <td>${selecoesArray[i]['Pontuacao']}</td>
+            </tr>
+            <tr>
+                <td>${selecoesArray[++i]['Name']}</td>
+                <td>${selecoesArray[i]['QtdGols']}</td>
+                <td>${selecoesArray[i]['QtdGolsPenalti']}</td>
+                <td>${selecoesArray[i]['Pontuacao']}</td>
+            </tr>`;
+    }
+     
+    document.getElementById('main_container').className = 'main_body_outer2';
+    document.getElementById('main_body').className = 'index_main_body_inner2';
+    document.getElementById("main_body").innerHTML = dadosHtml;
+
+    //Modificar o botão avançar.
+    
+}
+
+function FisherYatesShuffle(array){
+    for (let i = array.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1)); //Gera de 0 a i
+
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+}
+
+
+function aiai(){
+    alert('ui');
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /*async function mostrarSelecoes() {

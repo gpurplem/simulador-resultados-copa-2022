@@ -134,12 +134,26 @@ Main Index
     color: var(--color6);
 }
 
+/*Primeira tabela: todas as seleções.*/
 .index_main_body_inner1 {
     color: var(--color5);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+}
+
+/*Segunda: todos os grupos AH*/
+.main_body_outer2 {
+    width: 100vw;
+    height: 82vh;
+    display: grid;
+    overflow: scroll;
+    grid-template-columns: auto auto auto auto;
+}
+.index_main_body_inner2 {
+    color: var(--color5);
+    display: contents;
 }
 
 .table1, .table1 th, .table1 td  {
