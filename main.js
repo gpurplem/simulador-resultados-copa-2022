@@ -61,7 +61,8 @@ async function mostrarSelecoes() {
     dadosHtml += "</table>";
 
     document.getElementById("main_body").innerHTML = dadosHtml;
-    document.getElementById("nav-top").innerHTML  += "<button class='btn btn-nav'>AVANÇAR</button>";
+    document.getElementById("nav-top").innerHTML  += "<button class='btn btn-nav' id='avancar-btn'>AVANÇAR</button>";
+    avancarBtn = document.getElementById("avancar-btn");
 }
 
 var iniciarBtn = document.getElementById("iniciar-btn");
@@ -75,7 +76,13 @@ async function iniciar() {
 
 iniciarBtn.addEventListener('click', iniciar);
 
+/*============================
+Mostrar seleções agrupadas após sorteio: 8 grupos de 4 (passo 2).
+============================*/
 
+var avancarBtn;
+
+avancarBtn.addEventListener("click", alert);
 
 
 /*async function mostrarSelecoes() {
