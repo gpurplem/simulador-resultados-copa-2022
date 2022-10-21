@@ -161,3 +161,82 @@ Main Index
     border:1px solid black;
     padding: 3px;
 }
+
+/*Variações da inner2: efeito de quem está jogando contra quem*/
+.rodada1 {
+    color: var(--color5);
+    display: contents;
+}
+.rodada1 .table1 tr:nth-child(2) td:nth-child(1){
+    color: var(--color0);
+    background: var(--color3);
+}
+.rodada1 .table1 tr:nth-child(3) td:nth-child(1){
+    color: var(--color0);
+    background: var(--color3);
+}
+
+.rodada2 {
+    color: var(--color5);
+    display: contents;
+}
+.rodada2 .table1 tr:nth-child(2) td:nth-child(1){
+    color: var(--color0);
+    background: var(--color3);
+}
+.rodada2 .table1 tr:nth-child(4) td:nth-child(1){
+    color: var(--color0);
+    background: var(--color3);
+}
+
+.rodada3 {
+    color: var(--color5);
+    display: contents;
+}
+.rodada3 .table1 tr:nth-child(2) td:nth-child(1){
+    color: var(--color0);
+    background: var(--color3);
+}
+.rodada3 .table1 tr:nth-child(5) td:nth-child(1){
+    color: var(--color0);
+    background: var(--color3);
+}
+
+.rodada4 {
+    color: var(--color5);
+    display: contents;
+}
+.rodada4 .table1 tr:nth-child(3) td:nth-child(1){
+    color: var(--color0);
+    background: var(--color3);
+}
+.rodada4 .table1 tr:nth-child(4) td:nth-child(1){
+    color: var(--color0);
+    background: var(--color3);
+}
+
+.rodada5 {
+    color: var(--color5);
+    display: contents;
+}
+.rodada5 .table1 tr:nth-child(3) td:nth-child(1){
+    color: var(--color0);
+    background: var(--color3);
+}
+.rodada5 .table1 tr:nth-child(5) td:nth-child(1){
+    color: var(--color0);
+    background: var(--color3);
+}
+
+.rodada6 {
+    color: var(--color5);
+    display: contents;
+}
+.rodada6 .table1 tr:nth-child(4) td:nth-child(1){
+    color: var(--color0);
+    background: var(--color3);
+}
+.rodada6 .table1 tr:nth-child(5) td:nth-child(1){
+    color: var(--color0);
+    background: var(--color3);
+}

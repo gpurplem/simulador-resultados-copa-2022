@@ -21,13 +21,14 @@ function iniciarPrograma() {
     document.getElementById("iniciar-btn").remove();
     document.getElementById("main_body").className = "index_main_body_inner1"; //Muda classe da div main_body_inner.
     mostrarSelecoes();
-    exibirBtnAvancar();
+    modBtnAvancar("mostrarSelecoesAH");
 }
 
 /*
 Ordem do botão avançar:
 1. mostrarSelecoesAH()
-2.
+2. a 7. rodada1() a rodada6()
+8. 
 */
 
 /*============================
@@ -75,24 +76,32 @@ async function mostrarSelecoes() {
     document.getElementById("main_body").innerHTML = dadosHtml;
 }
 
-function exibirBtnAvancar() {
-    document.getElementById("nav-top").innerHTML +=
-    `<button class='btn btn-nav' id='avancar-btn' onclick='mostrarSelecoesAH()'>AVANÇAR</button>`;
+function modBtnAvancar(funcao) {
+    const btn = document.getElementById("avancar-btn");
+    
+    if(btn == null){
+        document.getElementById("nav-top").innerHTML +=
+        `<button class='btn btn-nav' id='avancar-btn' onclick='${funcao}()'>AVANÇAR</button>`;
+    } else {
+        btn.remove();
+        document.getElementById("nav-top").innerHTML +=
+        `<button class='btn btn-nav' id='avancar-btn' onclick='${funcao}()'>AVANÇAR</button>`;
+    }
 }
 
-function mostrarSelecoesAH(){
+function situacaoAtualizadas(){
     let dadosHtml = "";
     const grupo = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-    FisherYatesShuffle(selecoesArray);
-
-    document.getElementById('table1').remove();
 
     //Mod HTML: mostrar as seleções em grupos      
     for (let i = 0, j=0; i < 32; i++) {
         dadosHtml +=
         `<table class='table1' id='table2'>
             <tr>
-                <th colspan='4'>${grupo[j++]}</th>
+                <th>${grupo[j++]}</th>
+                <th>Gol</th>
+                <th>Penalti</th>
+                <th>Ponto</th>
             </tr>            
             <tr>
                 <td>${selecoesArray[i]['Name']}</td>
@@ -119,13 +128,25 @@ function mostrarSelecoesAH(){
                 <td>${selecoesArray[i]['Pontuacao']}</td>
             </tr>`;
     }
+
+    return dadosHtml;
+}
+
+function mostrarSelecoesAH(){
+    let dadosHtml = "";
+    //const grupo = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+    FisherYatesShuffle(selecoesArray);
+
+    document.getElementById('table1').remove();
+
+    dadosHtml = situacaoAtualizadas();
      
     document.getElementById('main_container').className = 'main_body_outer2';
     document.getElementById('main_body').className = 'index_main_body_inner2';
     document.getElementById("main_body").innerHTML = dadosHtml;
 
     //Modificar o botão avançar.
-    
+    modBtnAvancar("rodada1");
 }
 
 function FisherYatesShuffle(array){
@@ -136,13 +157,37 @@ function FisherYatesShuffle(array){
       }
 }
 
+function rodada1(){
+    document.getElementById('main_body').className = 'rodada1';
+    modBtnAvancar("rodada2");
 
-function aiai(){
-    alert('ui');
+    
 }
 
+function rodada2(){
+    document.getElementById('main_body').className = 'rodada2';
+    modBtnAvancar("rodada3");
+}
 
+function rodada3(){
+    document.getElementById('main_body').className = 'rodada3';
+    modBtnAvancar("rodada4");
+}
 
+function rodada4(){
+    document.getElementById('main_body').className = 'rodada4';
+    modBtnAvancar("rodada5");
+}
+
+function rodada5(){
+    document.getElementById('main_body').className = 'rodada5';
+    modBtnAvancar("rodada6");
+}
+
+function rodada6(){
+    document.getElementById('main_body').className = 'rodada6';
+    modBtnAvancar("oitava1");
+}
 
 
 
