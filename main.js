@@ -309,7 +309,8 @@ function desempatar(a, b, c, d) {
     const CisNull = c == null;
     const DisNull = d == null;
 
-    if (CisNull && DisNull) { //Selecao B(a) e C(b) com mesma pontuação
+    //Quando houver 2 parâmetros apenas: selecao B(a) e C(b)
+    if (CisNull && DisNull) {
         const golsB = selecoesArray[a].QtdGols;
         const golsC = selecoesArray[b].QtdGols;
         const penaltiB = selecoesArray[a].QtdGolsPenalti;
@@ -324,8 +325,15 @@ function desempatar(a, b, c, d) {
         } else {
             if (penaltiB > penaltiC) {
                 selecoesArray[a].VenceuRodadas = true;
-            } else {
+            } else if (penaltiB < penaltiC) {
                 selecoesArray[b].VenceuRodadas = true;
+            } else { //Caso pontuação, gols e pênaltis sejam iguais.
+                const resultado = Math.round(Math.random());
+                if (resultado === 0) {
+                    selecoesArray[a].VenceuRodadas = true;
+                } else {
+                    selecoesArray[b].VenceuRodadas = true;
+                }
             }
         }
     } else if (!CisNull && DisNull) { //Selecao B(a) e C(b) e D(c) com mesma pontuação
@@ -436,38 +444,38 @@ function desempatar(a, b, c, d) {
         }
 
         //Se 2 forem iguais e maiores que o restante
-        if (golsA > golsC && golsA > golsD){
+        if (golsA > golsC && golsA > golsD) {
             selecoesArray[a].VenceuRodadas = true;
             selecoesArray[b].VenceuRodadas = true;
             return;
-        } else if (golsA > golsB && golsA > golsD){
+        } else if (golsA > golsB && golsA > golsD) {
             selecoesArray[a].VenceuRodadas = true;
             selecoesArray[c].VenceuRodadas = true;
             return;
-        } else if (golsA > golsB && golsA > golsC){
+        } else if (golsA > golsB && golsA > golsC) {
             selecoesArray[a].VenceuRodadas = true;
             selecoesArray[d].VenceuRodadas = true;
             return;
-        } else if (golsB > golsA && golsB > golsD){
+        } else if (golsB > golsA && golsB > golsD) {
             selecoesArray[b].VenceuRodadas = true;
             selecoesArray[c].VenceuRodadas = true;
             return;
-        } else if (golsB > golsA && golsB > golsC){
+        } else if (golsB > golsA && golsB > golsC) {
             selecoesArray[b].VenceuRodadas = true;
             selecoesArray[d].VenceuRodadas = true;
             return;
-        } else if (golsC > golsA && golsC > golsB){
+        } else if (golsC > golsA && golsC > golsB) {
             selecoesArray[c].VenceuRodadas = true;
             selecoesArray[d].VenceuRodadas = true;
             return;
         }
 
         //Se 3 forem iguais e maiores que o restante
-        if(golsA === golsB === golsC){
+        if (golsA === golsB === golsC) {
             desempatar(a, b, c);
-        } else if(golsB === golsC === golsD){
+        } else if (golsB === golsC === golsD) {
             desempatar(b, c, d);
-        } else if(golsA === golsB === golsD){
+        } else if (golsA === golsB === golsD) {
             desempatar(a, b, d);
         } else {
             desempatar(a, c, d);
@@ -477,11 +485,11 @@ function desempatar(a, b, c, d) {
         const classificouB = selecoesArray[b].VenceuRodadas === true;
         const classificouC = selecoesArray[c].VenceuRodadas === true;
 
-        if(classificouA){
+        if (classificouA) {
             desempatar(b, c, d);
-        } else if(classificouB){
+        } else if (classificouB) {
             desempatar(a, c, d);
-        } else if(classificouC){
+        } else if (classificouC) {
             desempatar(a, b, d);
         } else {
             desempatar(a, b, c);
@@ -490,28 +498,38 @@ function desempatar(a, b, c, d) {
     }
 }
 
+//Marca seleções que passaram da primeira etapa da copa
 function preOitava() {
-    //Desempates
-    //A = B = C = D compara gol e talvez penalti
-    //A > B = C = D compara gol e talvez penalti de BCD
-    //A > B = C > D compara gol e talvez penalti BC
+    //selecoesArray[]: cada grupo (AH) está ordenado descrescente por pontuação
 
-    //Pontuação
+    //Marcar quais seleções passaram da primeira etapa da copa
     for (let i = 0; i < 32; i += 4) {
         let AmaiorB = selecoesArray[i].Pontuacao > selecoesArray[i + 1].Pontuacao;
         let AigualB = selecoesArray[i].Pontuacao === selecoesArray[i + 1].Pontuacao;
-        let BmaiorC = selecoesArray[i + 1].Pontuacao > selecoesArray[i + 2].Pontuacao;
         let BigualC = selecoesArray[i + 1].Pontuacao === selecoesArray[i + 2].Pontuacao;
         let CmaiorD = selecoesArray[i + 2].Pontuacao > selecoesArray[i + 3].Pontuacao;
         let CigualD = selecoesArray[i + 2].Pontuacao === selecoesArray[i + 3].Pontuacao;
 
+        //A=B=C=D
         if (AigualB && BigualC && CigualD) {
+            console.log("preOitava->if1\n");
             desempatar(i, i + 1, i + 2, i + 3);
-        } else if (AmaiorB && BigualC && CigualD) {
+        }
+        //A>b=c=d
+        else if (AmaiorB && BigualC && CigualD) {
+            console.log("preOitava->if2\n");
+            selecoesArray[i].VenceuRodadas = true;
             desempatar(i + 1, i + 2, i + 3);
-        } else if (AmaiorB && BigualC && CmaiorD) {
+        }
+        //A>b=c>d
+        else if (AmaiorB && BigualC && CmaiorD) {
+            console.log("preOitava->if3\n");
+            selecoesArray[i].VenceuRodadas = true;
             desempatar(i + 1, i + 2);
-        } else {
+        }
+        //AB>cd
+        else {
+            console.log("preOitava->if4\n");
             selecoesArray[i].VenceuRodadas = true;
             selecoesArray[i + 1].VenceuRodadas = true;
         }
