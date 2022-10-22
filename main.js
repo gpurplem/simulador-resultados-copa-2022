@@ -8,6 +8,10 @@ class selecaoObj {
         this.QtdGols = 0;
         this.QtdGolsPenalti = 0;
         this.Pontuacao = 0;
+        this.Vitorias = 0;
+        this.VenceuRodadas = false;
+        this.VenceuOitavas = false;
+        this.VenceuQuartas = false;
     }
 }
 
@@ -134,10 +138,12 @@ function situacaoAtualizada() {
 
 function mostrarSelecoesAH() {
     let dadosHtml = "";
-    //const grupo = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
     FisherYatesShuffle(selecoesArray);
 
-    document.getElementById('table1').remove();
+    const btn = document.getElementById('table1');
+    if (btn !== null) {
+        btn.remove();
+    }
 
     dadosHtml = situacaoAtualizada();
 
@@ -184,6 +190,12 @@ function gerarPenalti(time1, time2) {
         p2 += Math.round(Math.random());
     }
 
+    if(p1>p2){
+        selecoesArray[time1].Vitorias += 1;
+    } else {
+        selecoesArray[time2].Vitorias += 1;
+    }
+    
     selecoesArray[time1].QtdGolsPenalti += p1;
     selecoesArray[time2].QtdGolsPenalti += p2;
 }
@@ -192,18 +204,24 @@ function gerarGols(time1, time2) {
     let qtd1 = 0;
     let qtd2 = 0;
 
+    //Cada passada é uma partida entre 2 times
     while (time1 < 32 && time2 < 32) {
         //Vetor guarda gols anteriores
-        selecoesArray[time1].QtdGols += gerarInt09();
-        selecoesArray[time2].QtdGols += gerarInt09();
+        qtd1 = gerarInt09();
+        qtd2 = gerarInt09();
 
-        //Verificar se NESTA partida será preciso pênalti
-        qtd1 += selecoesArray[time1].QtdGols;
-        qtd2 += selecoesArray[time2].QtdGols;
+        selecoesArray[time1].QtdGols += qtd1;
+        selecoesArray[time2].QtdGols += qtd2;
 
         //Verificar necessidade de pênalti
         if (qtd1 === qtd2) {
             gerarPenalti(time1, time2);
+        } else {
+            if(qtd1>qtd2){
+                selecoesArray[time1].Vitorias += 1;
+            } else {
+                selecoesArray[time2].Vitorias += 1;
+            }
         }
 
         time1 += 4;
@@ -217,6 +235,7 @@ function rodada1() {
     document.getElementById('main_body').className = 'rodada1';
     modBtnAvancar("rodada2");
     gerarGols(0, 1);
+    atualizarPontuacao();
     document.getElementById("main_body").innerHTML = situacaoAtualizada();
 }
 
@@ -224,6 +243,7 @@ function rodada2() {
     document.getElementById('main_body').className = 'rodada2';
     modBtnAvancar("rodada3");
     gerarGols(0, 2);
+    atualizarPontuacao();
     document.getElementById("main_body").innerHTML = situacaoAtualizada();
 }
 
@@ -231,6 +251,7 @@ function rodada3() {
     document.getElementById('main_body').className = 'rodada3';
     modBtnAvancar("rodada4");
     gerarGols(0, 3);
+    atualizarPontuacao();
     document.getElementById("main_body").innerHTML = situacaoAtualizada();
 }
 
@@ -238,6 +259,7 @@ function rodada4() {
     document.getElementById('main_body').className = 'rodada4';
     modBtnAvancar("rodada5");
     gerarGols(1, 2);
+    atualizarPontuacao();
     document.getElementById("main_body").innerHTML = situacaoAtualizada();
 }
 
@@ -245,45 +267,60 @@ function rodada5() {
     document.getElementById('main_body').className = 'rodada5';
     modBtnAvancar("rodada6");
     gerarGols(1, 3);
+    atualizarPontuacao();
     document.getElementById("main_body").innerHTML = situacaoAtualizada();
 }
 
 function rodada6() {
     document.getElementById('main_body').className = 'rodada6';
-    modBtnAvancar("oitava1");
+    modBtnAvancar("preOitava");
     gerarGols(2, 3);
+    atualizarPontuacao();
+
+    //Ordenar por pontuação
+    let selecoesArrayTmp = new Array();
+    for(let i = 0; i<32; i+=4){
+        selecoesArrayTmp = selecoesArrayTmp.concat(selecoesArray.slice(i, i+4).sort(comparePorPontos));
+        console.log(selecoesArrayTmp.length);
+    }
+    selecoesArray = selecoesArrayTmp;
+
     document.getElementById("main_body").innerHTML = situacaoAtualizada();
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*async function mostrarSelecoes() {
-    dadosHtml = "<h2 style='text-align: center'>Seleções e placar inicial</h2><table class='table1'>" + 
-    "<tr><th>Seleção</th><th>Gols</th><th>Pênaltis</th><th>Pontuação</th></tr>";
-
-    for(let i = 0; i<32; i++){
-        let pais = selecoesArray[i]['Name'];
-        let gols = selecoesArray[i]['QtdGols'];
-        let penaltis = selecoesArray[i]['QtdGolsPenalti'];
-        let pontuacao = selecoesArray[i]['Pontuacao'];
-
-        dadosHtml += '<tr>' + '<td>' + pais + '</td>' + '<td>' + gols + '</td>' 
-        + '<td>' + penaltis + '</td>' + '<td>' + pontuacao + '</td>' + '</tr>';
+function atualizarPontuacao(){
+    //Calcular pontuação final: 3*vitórias
+    for (let i = 0; i < 32; i++) {
+        selecoesArray[i].Pontuacao = 3 * selecoesArray[i].Vitorias;
     }
-    dadosHtml += "</table>";
+}
 
-    document.getElementById("main_body").innerHTML = dadosHtml;
-    document.getElementById("nav-top").innerHTML  += "<button class='btn btn-nav'>AVANÇAR</button>";
-}*/
+function comparePorPontos(time1, time2) {
+    if (time1.Pontuacao > time2.Pontuacao){
+      return -1;
+    }
+    if (time1.Pontuacao < time2.Pontuacao){
+      return 1;
+    }
+    return 0;
+}
+
+function preOitava(){
+    
+    //A > B > C //Basta pegar os 2 primeiros
+    //A = B > C //Basta pegar os 2 primeiros
+
+    //A = B = C = D //compara gol e talvez penalti
+    //A > B = C = D //compara gol e talvez penalti de BCD
+    //A > B = C > D //compara gol e talvez penalti BC
+
+
+
+    
+
+
+    //verificar pontuação igual
+    //desempatar por num de gols
+    //desempatar por num de pênaltis
+}
+
