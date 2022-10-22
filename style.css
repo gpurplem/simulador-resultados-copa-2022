@@ -10,6 +10,7 @@ Geral
     --color4: #667292;
     --color5: #39466a;
     --color6: #f1e3dd;
+    --colorVS : #4b4b4c;
 
     --border-radius: 2rem;
 }
@@ -237,6 +238,42 @@ Main Index
     background: var(--color3);
 }
 .simularRodada3B .table1 tr:nth-child(5) td:nth-child(1){
+    color: var(--color0);
+    background: var(--color3);
+}
+
+.inicializarOitavasA {
+    color: var(--color5);
+    display: contents;
+}
+.inicializarOitavasA .inicializarOitavasA1 tr:nth-child(2) td:nth-child(1){
+    color: var(--color0);
+    background: var(--color3);
+}
+.inicializarOitavasA .inicializarOitavasA2 tr:nth-child(3) td:nth-child(1){
+    color: var(--color0);
+    background: var(--color3);
+}
+.inicializarOitavasA1 {
+    border-top: 3px solid var(--colorVS);
+    border-left: 3px solid var(--colorVS);
+    border-bottom: 3px solid var(--colorVS);
+}
+.inicializarOitavasA2 {
+    border-top: 3px solid var(--colorVS);
+    border-right: 3px solid var(--colorVS);
+    border-bottom: 3px solid var(--colorVS);
+}
+
+.inicializarOitavasB {
+    color: var(--color5);
+    display: contents;
+}
+.inicializarOitavasB .inicializarOitavasA2 tr:nth-child(2) td:nth-child(1){
+    color: var(--color0);
+    background: var(--color3);
+}
+.inicializarOitavasB .inicializarOitavasA1 tr:nth-child(3) td:nth-child(1){
     color: var(--color0);
     background: var(--color3);
 }
