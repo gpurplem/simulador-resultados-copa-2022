@@ -1,6 +1,4 @@
-/*============================
-Classes e estruturas globais.
-============================*/
+//Dados de uma seleção
 class selecaoObj {
     constructor(Name, Token) {
         this.Name = Name;
@@ -15,12 +13,10 @@ class selecaoObj {
     }
 }
 
+//Armazena todas as seleções
 let selecoesArray = new Array(32);
-let controleBtnAvancar = 0;
 
-/*============================
-Ordem de execução
-============================*/
+//Inicia a cadeia de chamadas das funções do programa
 function iniciarPrograma() {
     document.getElementById("iniciar-btn").remove();
     document.getElementById("main_body").className = "index_main_body_inner1"; //Muda classe da div main_body_inner.
@@ -28,16 +24,7 @@ function iniciarPrograma() {
     modBtnAvancar("mostrarSelecoesAH");
 }
 
-/*
-Ordem do botão avançar:
-1. mostrarSelecoesAH()
-2. a 7. rodada1() a rodada6()
-8. 
-*/
-
-/*============================
-Funções
-============================*/
+//Obtem dados da API e exibe primeira tabela com nomes das seleções
 async function mostrarSelecoes() {
     const apiUrl = "https://estagio.geopostenergy.com/WorldCup/GetAllTeams";
     let dadosHtml = "";
@@ -80,6 +67,7 @@ async function mostrarSelecoes() {
     document.getElementById("main_body").innerHTML = dadosHtml;
 }
 
+//Modifica onClick do botão avançar para qualquer função
 function modBtnAvancar(funcao) {
     const btn = document.getElementById("avancar-btn");
 
@@ -87,12 +75,14 @@ function modBtnAvancar(funcao) {
         document.getElementById("nav-top").innerHTML +=
             `<button class='btn btn-nav' id='avancar-btn' onclick='${funcao}()'>AVANÇAR</button>`;
     } else {
+        //Se não remover e recriá-la, onclick não muda.
         btn.remove();
         document.getElementById("nav-top").innerHTML +=
             `<button class='btn btn-nav' id='avancar-btn' onclick='${funcao}()'>AVANÇAR</button>`;
     }
 }
 
+//Retorna HTML com dados atualizados dos oito grupos (AH).
 function situacaoAtualizada() {
     let dadosHtml = "";
     const grupo = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
@@ -136,10 +126,12 @@ function situacaoAtualizada() {
     return dadosHtml;
 }
 
+//Exibe as seleções e suas informações pela primeira vez no programa.
 function mostrarSelecoesAH() {
     let dadosHtml = "";
     FisherYatesShuffle(selecoesArray);
 
+    //Apaga a primeira tabela que fora exibida no programa
     const btn = document.getElementById('table1');
     if (btn !== null) {
         btn.remove();
@@ -147,14 +139,18 @@ function mostrarSelecoesAH() {
 
     dadosHtml = situacaoAtualizada();
 
+    //Atualiza classe da tabela que exibirá as seleções e seus placares
     document.getElementById('main_container').className = 'main_body_outer2';
     document.getElementById('main_body').className = 'index_main_body_inner2';
+
+    //Insere os dados no HTML
     document.getElementById("main_body").innerHTML = dadosHtml;
 
-    //Modificar o botão avançar.
+    //Modifica o botão avançar para continuar alterando a página
     modBtnAvancar("rodada1");
 }
 
+//Embaralha os elementos de um vetor
 function FisherYatesShuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
         let j = Math.floor(Math.random() * (i + 1)); //Gera de 0 a i
@@ -167,6 +163,7 @@ function gerarInt09() {
     return Math.floor(Math.random() * 10);
 }
 
+//Gera resultados de pênalti entre dois times
 function gerarPenalti(time1, time2) {
     let p1 = 0;
     let p2 = 0;
@@ -175,10 +172,9 @@ function gerarPenalti(time1, time2) {
         p1 += Math.round(Math.random());
         p2 += Math.round(Math.random());
 
-        //Checar se algum time já ganhou (mesmo que oponente acerte as tentativas restantes)
+        //Checar se algum time já ganhou (mesmo se oponente acertasse as tentativas restantes)
         p1jaganhou = p1 > (p2 + (4 - i));
         p2jaganhou = p2 > (p1 + (4 - i));
-
         if ((p1jaganhou && !p2jaganhou) || (!p1jaganhou && p2jaganhou)) {
             break;
         }
@@ -200,13 +196,13 @@ function gerarPenalti(time1, time2) {
     selecoesArray[time2].QtdGolsPenalti += p2;
 }
 
+//Percorre todas as seleções simulando partidas entre dois times dentro do mesmo grupo (AH) sem possibilidade de empate
 function gerarGols(time1, time2) {
     let qtd1 = 0;
     let qtd2 = 0;
 
     //Cada passada é uma partida entre 2 times
     while (time1 < 32 && time2 < 32) {
-        //Vetor guarda gols anteriores
         qtd1 = gerarInt09();
         qtd2 = gerarInt09();
 
@@ -224,8 +220,11 @@ function gerarGols(time1, time2) {
             }
         }
 
+        //Próximo time
         time1 += 4;
         time2 += 4;
+
+        //Verifica se houve empate para então chamar gerarPenalti()
         qtd1 = 0;
         qtd2 = 0;
     }
@@ -277,24 +276,24 @@ function rodada6() {
     gerarGols(2, 3);
     atualizarPontuacao();
 
-    //Ordenar por pontuação
+    //Ordenar dentro dos grupos (AH) por pontuação
     let selecoesArrayTmp = new Array();
     for (let i = 0; i < 32; i += 4) {
         selecoesArrayTmp = selecoesArrayTmp.concat(selecoesArray.slice(i, i + 4).sort(comparePorPontos));
-        console.log(selecoesArrayTmp.length);
     }
     selecoesArray = selecoesArrayTmp;
 
     document.getElementById("main_body").innerHTML = situacaoAtualizada();
 }
 
+//Age sobre vetor global selecoesArray[]
 function atualizarPontuacao() {
-    //Calcular pontuação final: 3*vitórias
     for (let i = 0; i < 32; i++) {
         selecoesArray[i].Pontuacao = 3 * selecoesArray[i].Vitorias;
     }
 }
 
+//Define método de comparação do objeto seleçãoObj
 function comparePorPontos(time1, time2) {
     if (time1.Pontuacao > time2.Pontuacao) {
         return -1;
@@ -305,6 +304,7 @@ function comparePorPontos(time1, time2) {
     return 0;
 }
 
+//Analisa quantidade de gols e depois de pênaltis quando pontução entre times é igual.
 function desempatar(a, b, c, d) {
     const CisNull = c == null;
     const DisNull = d == null;
@@ -336,7 +336,8 @@ function desempatar(a, b, c, d) {
                 }
             }
         }
-    } else if (!CisNull && DisNull) { //Selecao B(a) e C(b) e D(c) com mesma pontuação
+    //Selecao B(a) e C(b) e D(c) com mesma pontuação
+    } else if (!CisNull && DisNull) { 
         const golsB = selecoesArray[a].QtdGols;
         const golsC = selecoesArray[b].QtdGols;
         const golsD = selecoesArray[c].QtdGols;
@@ -480,6 +481,7 @@ function desempatar(a, b, c, d) {
         } else {
             desempatar(a, c, d);
         }
+        
         //Checar qual foi selecionado e selecionar mais 1
         const classificouA = selecoesArray[a].VenceuRodadas === true;
         const classificouB = selecoesArray[b].VenceuRodadas === true;
@@ -494,7 +496,6 @@ function desempatar(a, b, c, d) {
         } else {
             desempatar(a, b, c);
         }
-
     }
 }
 
@@ -512,24 +513,20 @@ function preOitava() {
 
         //A=B=C=D
         if (AigualB && BigualC && CigualD) {
-            console.log("preOitava->if1\n");
             desempatar(i, i + 1, i + 2, i + 3);
         }
         //A>b=c=d
         else if (AmaiorB && BigualC && CigualD) {
-            console.log("preOitava->if2\n");
             selecoesArray[i].VenceuRodadas = true;
             desempatar(i + 1, i + 2, i + 3);
         }
         //A>b=c>d
         else if (AmaiorB && BigualC && CmaiorD) {
-            console.log("preOitava->if3\n");
             selecoesArray[i].VenceuRodadas = true;
             desempatar(i + 1, i + 2);
         }
         //AB>cd
         else {
-            console.log("preOitava->if4\n");
             selecoesArray[i].VenceuRodadas = true;
             selecoesArray[i + 1].VenceuRodadas = true;
         }
