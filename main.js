@@ -1,4 +1,8 @@
-//Dados de uma seleção
+/*==================================================
+Dados globais
+==================================================*/
+
+//Molde de uma seleção
 class selecaoObj {
     constructor(Name, Token) {
         this.Name = Name;
@@ -16,55 +20,33 @@ class selecaoObj {
 //Armazena todas as seleções
 let selecoesArray = new Array(32);
 
+/*==================================================
+Main
+==================================================*/
+
 //Inicia a cadeia de chamadas das funções do programa
 function iniciarPrograma() {
     document.getElementById("iniciar-btn").remove();
-    document.getElementById("main_body").className = "index_main_body_inner1"; //Muda classe da div main_body_inner.
-    mostrarSelecoes();
-    modBtnAvancar("mostrarSelecoesAH");
+    document.getElementById("main_body").className = "index_main_body_inner1";
+
+    inicializarSimulador();
+    modBtnAvancar("inicializarGruposAH");
+    //simularRodada() - 1 a 3
 }
 
-//Obtem dados da API e exibe primeira tabela com nomes das seleções
-async function mostrarSelecoes() {
-    const apiUrl = "https://estagio.geopostenergy.com/WorldCup/GetAllTeams";
-    let dadosHtml = "";
-    let dados;
+/*==================================================
+Funções de suporte a outras
+==================================================*/
 
-    //Get dados da API
-    const resposta = await fetch(apiUrl,
-        {
-            method: 'GET', headers: { 'git-user': 'gpurplem' },
-            response: 'JSON'
-        });
-
-    dados = await resposta.json();
-
-    //Load vetor de seleções.
-    for (let i = 0; i < 32; i++) {
-        selecoesArray[i] = new selecaoObj(dados.Result[i].Name, dados.Result[i].Token);
+//Define método de comparação do objeto seleçãoObj
+function comparePorPontos(time1, time2) {
+    if (time1.Pontuacao > time2.Pontuacao) {
+        return -1;
     }
-
-    //Mod HTML: mostrar as seleções em uma tabela
-    dadosHtml =
-        `<table class='table1' id='table1'>
-        <tr>
-            <th colspan='4'>Seleções</th>
-        </tr>`;
-
-    for (let i = 0; i < 32; i++) {
-        dadosHtml +=
-            `<tr>
-            <td>${selecoesArray[i]['Name']}</td>
-            <td>${selecoesArray[++i]['Name']}</td>
-            <td>${selecoesArray[++i]['Name']}</td>
-            <td>${selecoesArray[++i]['Name']}</td>
-        </tr>`;
+    if (time1.Pontuacao < time2.Pontuacao) {
+        return 1;
     }
-
-    dadosHtml +=
-        `</table>`;
-
-    document.getElementById("main_body").innerHTML = dadosHtml;
+    return 0;
 }
 
 //Modifica onClick do botão avançar para qualquer função
@@ -80,6 +62,19 @@ function modBtnAvancar(funcao) {
         document.getElementById("nav-top").innerHTML +=
             `<button class='btn btn-nav' id='avancar-btn' onclick='${funcao}()'>AVANÇAR</button>`;
     }
+}
+
+//Embaralha os elementos de um vetor
+function FisherYatesShuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1)); //Gera de 0 a i
+
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function gerarInt09() {
+    return Math.floor(Math.random() * 10);
 }
 
 //Retorna HTML com dados atualizados dos oito grupos (AH).
@@ -126,45 +121,15 @@ function situacaoAtualizada() {
     return dadosHtml;
 }
 
-//Exibe as seleções e suas informações pela primeira vez no programa.
-function mostrarSelecoesAH() {
-    let dadosHtml = "";
-    FisherYatesShuffle(selecoesArray);
-
-    //Apaga a primeira tabela que fora exibida no programa
-    const btn = document.getElementById('table1');
-    if (btn !== null) {
-        btn.remove();
+//Age sobre vetor global selecoesArray[]
+function atualizarPontuacao() {
+    for (let i = 0; i < 32; i++) {
+        selecoesArray[i].Pontuacao = 3 * selecoesArray[i].Vitorias;
     }
-
-    dadosHtml = situacaoAtualizada();
-
-    //Atualiza classe da tabela que exibirá as seleções e seus placares
-    document.getElementById('main_container').className = 'main_body_outer2';
-    document.getElementById('main_body').className = 'index_main_body_inner2';
-
-    //Insere os dados no HTML
-    document.getElementById("main_body").innerHTML = dadosHtml;
-
-    //Modifica o botão avançar para continuar alterando a página
-    modBtnAvancar("rodada1");
-}
-
-//Embaralha os elementos de um vetor
-function FisherYatesShuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1)); //Gera de 0 a i
-
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-}
-
-function gerarInt09() {
-    return Math.floor(Math.random() * 10);
 }
 
 //Gera resultados de pênalti entre dois times
-function gerarPenalti(time1, time2) {
+function gerarPenaltis(time1, time2) {
     let p1 = 0;
     let p2 = 0;
 
@@ -211,7 +176,7 @@ function gerarGols(time1, time2) {
 
         //Verificar necessidade de pênalti
         if (qtd1 === qtd2) {
-            gerarPenalti(time1, time2);
+            gerarPenaltis(time1, time2);
         } else {
             if (qtd1 > qtd2) {
                 selecoesArray[time1].Vitorias += 1;
@@ -224,84 +189,10 @@ function gerarGols(time1, time2) {
         time1 += 4;
         time2 += 4;
 
-        //Verifica se houve empate para então chamar gerarPenalti()
+        //Verifica se houve empate para então chamar gerarPenaltis()
         qtd1 = 0;
         qtd2 = 0;
     }
-}
-
-function rodada1() {
-    document.getElementById('main_body').className = 'rodada1';
-    modBtnAvancar("rodada2");
-    gerarGols(0, 1);
-    atualizarPontuacao();
-    document.getElementById("main_body").innerHTML = situacaoAtualizada();
-}
-
-function rodada2() {
-    document.getElementById('main_body').className = 'rodada2';
-    modBtnAvancar("rodada3");
-    gerarGols(0, 2);
-    atualizarPontuacao();
-    document.getElementById("main_body").innerHTML = situacaoAtualizada();
-}
-
-function rodada3() {
-    document.getElementById('main_body').className = 'rodada3';
-    modBtnAvancar("rodada4");
-    gerarGols(0, 3);
-    atualizarPontuacao();
-    document.getElementById("main_body").innerHTML = situacaoAtualizada();
-}
-
-function rodada4() {
-    document.getElementById('main_body').className = 'rodada4';
-    modBtnAvancar("rodada5");
-    gerarGols(1, 2);
-    atualizarPontuacao();
-    document.getElementById("main_body").innerHTML = situacaoAtualizada();
-}
-
-function rodada5() {
-    document.getElementById('main_body').className = 'rodada5';
-    modBtnAvancar("rodada6");
-    gerarGols(1, 3);
-    atualizarPontuacao();
-    document.getElementById("main_body").innerHTML = situacaoAtualizada();
-}
-
-function rodada6() {
-    document.getElementById('main_body').className = 'rodada6';
-    modBtnAvancar("preOitava");
-    gerarGols(2, 3);
-    atualizarPontuacao();
-
-    //Ordenar dentro dos grupos (AH) por pontuação
-    let selecoesArrayTmp = new Array();
-    for (let i = 0; i < 32; i += 4) {
-        selecoesArrayTmp = selecoesArrayTmp.concat(selecoesArray.slice(i, i + 4).sort(comparePorPontos));
-    }
-    selecoesArray = selecoesArrayTmp;
-
-    document.getElementById("main_body").innerHTML = situacaoAtualizada();
-}
-
-//Age sobre vetor global selecoesArray[]
-function atualizarPontuacao() {
-    for (let i = 0; i < 32; i++) {
-        selecoesArray[i].Pontuacao = 3 * selecoesArray[i].Vitorias;
-    }
-}
-
-//Define método de comparação do objeto seleçãoObj
-function comparePorPontos(time1, time2) {
-    if (time1.Pontuacao > time2.Pontuacao) {
-        return -1;
-    }
-    if (time1.Pontuacao < time2.Pontuacao) {
-        return 1;
-    }
-    return 0;
 }
 
 //Analisa quantidade de gols e depois de pênaltis quando pontução entre times é igual.
@@ -499,8 +390,8 @@ function desempatar(a, b, c, d) {
     }
 }
 
-//Marca seleções que passaram da primeira etapa da copa
-function preOitava() {
+//Marca em todo o vetor global seleções que passaram da primeira etapa da copa
+function atualizarVenceuRodadas() {
     //selecoesArray[]: cada grupo (AH) está ordenado descrescente por pontuação
 
     //Marcar quais seleções passaram da primeira etapa da copa
@@ -514,6 +405,22 @@ function preOitava() {
         //A=B=C=D
         if (AigualB && BigualC && CigualD) {
             desempatar(i, i + 1, i + 2, i + 3);
+        }
+        //A=B=C>d
+        else if(AigualB && BigualC && CmaiorD) {
+            desempatar(i, i + 1, i + 2);
+
+            const desempatouA = selecoesArray[i].VenceuRodadas;
+            const desempatouB = selecoesArray[i+1].VenceuRodadas;
+            const desempatouC = selecoesArray[i+2].VenceuRodadas;
+
+            if(desempatouA){
+                desempatar(i + 1, i + 2);
+            } else if(desempatouB){
+                desempatar(i, i + 2);
+            } else {
+                desempatar(i, i + 1);
+            }
         }
         //A>b=c=d
         else if (AmaiorB && BigualC && CigualD) {
@@ -531,5 +438,140 @@ function preOitava() {
             selecoesArray[i + 1].VenceuRodadas = true;
         }
     }
+}
+
+/*==================================================
+Funções
+==================================================*/
+
+//Obtem dados da API e exibe primeira tabela com nomes das seleções
+async function inicializarSimulador() {
+    const apiUrl = "https://estagio.geopostenergy.com/WorldCup/GetAllTeams";
+    let dadosHtml = "";
+    let dados;
+
+    //Get dados da API
+    const resposta = await fetch(apiUrl,
+        {
+            method: 'GET', headers: { 'git-user': 'gpurplem' },
+            response: 'JSON'
+        });
+
+    dados = await resposta.json();
+
+    //Load vetor de seleções.
+    for (let i = 0; i < 32; i++) {
+        selecoesArray[i] = new selecaoObj(dados.Result[i].Name, dados.Result[i].Token);
+    }
+
+    //Mod HTML: mostrar as seleções em uma tabela
+    dadosHtml =
+        `<table class='table1' id='table1'>
+        <tr>
+            <th colspan='4'>Seleções</th>
+        </tr>`;
+
+    for (let i = 0; i < 32; i++) {
+        dadosHtml +=
+            `<tr>
+            <td>${selecoesArray[i]['Name']}</td>
+            <td>${selecoesArray[++i]['Name']}</td>
+            <td>${selecoesArray[++i]['Name']}</td>
+            <td>${selecoesArray[++i]['Name']}</td>
+        </tr>`;
+    }
+
+    dadosHtml +=
+        `</table>`;
+
+    document.getElementById("main_body").innerHTML = dadosHtml;
+}
+
+//Exibe as seleções e suas informações pela primeira vez no programa.
+function inicializarGruposAH() {
+    let dadosHtml = "";
+    FisherYatesShuffle(selecoesArray);
+
+    //Apaga a primeira tabela que fora exibida no programa
+    const btn = document.getElementById('table1');
+    if (btn !== null) {
+        btn.remove();
+    }
+
+    dadosHtml = situacaoAtualizada();
+
+    //Atualiza classe da tabela que exibirá as seleções e seus placares
+    document.getElementById('main_container').className = 'main_body_outer2';
+    document.getElementById('main_body').className = 'index_main_body_inner2';
+
+    //Insere os dados no HTML
+    document.getElementById("main_body").innerHTML = dadosHtml;
+
+    //Modifica o botão avançar para continuar alterando a página
+    modBtnAvancar("simularRodada1A");
+}
+
+function simularRodada1A() {
+    document.getElementById('main_body').className = 'simularRodada1A';
+    modBtnAvancar("simularRodada1B");
+    gerarGols(0, 1);
+    atualizarPontuacao();
+    document.getElementById("main_body").innerHTML = situacaoAtualizada();
+}
+
+function simularRodada1B() {
+    document.getElementById('main_body').className = 'simularRodada1B';
+    modBtnAvancar("simularRodada2A");
+    gerarGols(0, 2);
+    atualizarPontuacao();
+    document.getElementById("main_body").innerHTML = situacaoAtualizada();
+}
+
+function simularRodada2A() {
+    document.getElementById('main_body').className = 'simularRodada2A';
+    modBtnAvancar("simularRodada2B");
+    gerarGols(0, 3);
+    atualizarPontuacao();
+    document.getElementById("main_body").innerHTML = situacaoAtualizada();
+}
+
+function simularRodada2B() {
+    document.getElementById('main_body').className = 'simularRodada2B';
+    modBtnAvancar("simularRodada3A");
+    gerarGols(1, 2);
+    atualizarPontuacao();
+    document.getElementById("main_body").innerHTML = situacaoAtualizada();
+}
+
+function simularRodada3A() {
+    document.getElementById('main_body').className = 'simularRodada3A';
+    modBtnAvancar("simularRodada3B");
+    gerarGols(1, 3);
+    atualizarPontuacao();
+    document.getElementById("main_body").innerHTML = situacaoAtualizada();
+}
+
+function simularRodada3B() {
+    document.getElementById('main_body').className = 'simularRodada3B';
+    
+    //modBtnAvancar("atualizarVenceuRodadas");
+    gerarGols(2, 3);
+    atualizarPontuacao();
+
+    //Ordenar dentro dos grupos (AH) por pontuação
+    let selecoesArrayTmp = new Array();
+    for (let i = 0; i < 32; i += 4) {
+        selecoesArrayTmp = selecoesArrayTmp.concat(selecoesArray.slice(i, i + 4).sort(comparePorPontos));
+    }
+    selecoesArray = selecoesArrayTmp;
+
+    document.getElementById("main_body").innerHTML = situacaoAtualizada();
+
+    atualizarVenceuRodadas();
+    modBtnAvancar("test");
+}
+
+function test(){
+    alert("teste");
 }
 
