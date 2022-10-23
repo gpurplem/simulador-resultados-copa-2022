@@ -300,3 +300,13 @@ Main Index
     grid-template-columns: auto;
     padding: 10% 30%;
 }
+
+.simularFinal {
+    color: var(--color5);
+    display: contents;
+}
+.vencedor {
+    color: var(--color5);
+    background: rgb(255, 247, 0);
+}
+

@@ -2,8 +2,7 @@
 Dados globais
 ==================================================*/
 
-//Molde de uma seleção
-class selecaoObj {
+class SelecaoObj {
     constructor(Name, Token) {
         this.Name = Name;
         this.Token = Token;
@@ -13,6 +12,17 @@ class selecaoObj {
         this.Vitorias = 0;
         this.VenceuRodadas = false;
         this.VenceuQuartas = false;
+    }
+}
+
+class Resultado {
+    constructor() {
+        this.equipeA;
+        this.equipeB;
+        this.golsEquipeA;
+        this.golsEquipeB;
+        this.golsPenaltyTimeA;
+        this.golsPenaltyTimeB;
     }
 }
 
@@ -205,13 +215,13 @@ function situacaoAtualizada() {
                 <th>Ponto</th>
             </tr>            
             <tr>
-                <td>${selecoesArray[i]['Name']}</td>
+                <td id='time1'>${selecoesArray[i]['Name']}</td>
                 <td>${selecoesArray[i]['QtdGols']}</td>
                 <td>${selecoesArray[i]['QtdGolsPenalti']}</td>
                 <td>${selecoesArray[i]['Pontuacao']}</td>
             </tr>
             <tr>
-                <td>${selecoesArray[++i]['Name']}</td>
+                <td id='time2'>${selecoesArray[++i]['Name']}</td>
                 <td>${selecoesArray[i]['QtdGols']}</td>
                 <td>${selecoesArray[i]['QtdGolsPenalti']}</td>
                 <td>${selecoesArray[i]['Pontuacao']}</td>
@@ -239,6 +249,10 @@ function atualizarPontuacao() {
         }
     } else if (selecoesArray.length === 4) {
         for (let i = 0; i < 4; i++) {
+            selecoesArray[i].Pontuacao = 3 * selecoesArray[i].Vitorias;
+        }
+    } else if (selecoesArray.length === 2) {
+        for (let i = 0; i < 2; i++) {
             selecoesArray[i].Pontuacao = 3 * selecoesArray[i].Vitorias;
         }
     }
@@ -397,7 +411,24 @@ function gerarGols(time1, time2) {
             qtd1 = 0;
             qtd2 = 0;
         }
-    } 
+    } else if (selecoesArray.length === 2) {
+        qtd1 = gerarInt09();
+        qtd2 = gerarInt09();
+
+        selecoesArray[time1].QtdGols += qtd1;
+        selecoesArray[time2].QtdGols += qtd2;
+
+        //Verificar necessidade de pênalti
+        if (qtd1 === qtd2) {
+            gerarPenaltis(time1, time2);
+        } else {
+            if (qtd1 > qtd2) {
+                selecoesArray[time1].Vitorias += 1;
+            } else {
+                selecoesArray[time2].Vitorias += 1;
+            }
+        }
+    }
 }
 
 //Analisa quantidade de gols e depois de pênaltis quando pontução entre times é igual.
@@ -666,7 +697,7 @@ async function inicializarSimulador() {
 
     //Load vetor de seleções.
     for (let i = 0; i < 32; i++) {
-        selecoesArray[i] = new selecaoObj(dados.Result[i].Name, dados.Result[i].Token);
+        selecoesArray[i] = new SelecaoObj(dados.Result[i].Name, dados.Result[i].Token);
     }
 
     //Mod HTML: mostrar as seleções em uma tabela
@@ -918,6 +949,38 @@ function inicializarFinal() {
     modBtnAvancar("simularFinal");
 }
 
-function simularFinal(){
+function simularFinal() {
+    gerarGols(0, 1);
+    atualizarPontuacao();
+    document.getElementById("main_body").innerHTML = situacaoAtualizada();
+    document.getElementById('main_body').className = 'simularFinal';
+    let vencedor;
+    let perdedor;
+
+    //Exibir ganhador
+    if (selecoesArray[0].Vitorias === 1) {
+        document.getElementById('time1').className = 'vencedor';
+    } else {
+        document.getElementById('time2').className = 'vencedor';
+    }
+
+    //Envio do resultado para API
+    var xhr = new XMLHttpRequest();
+    var url = "https://estagio.geopostenergy.com/WorldCup/InsertFinalResult";
+    xhr.open("POST", url, true);
+
+    xhr.setRequestHeader("git-user", "gpurplem");
+    xhr.setRequestHeader("Content-Type", "application/json");
+
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            var json = JSON.parse(xhr.responseText);
+            console.log(json);
+        }
+    };
+
+    var data = JSON.stringify({ "equipeA": `${selecoesArray[0].Token}`, "equipeB": `${selecoesArray[1].Token}`, "golsEquipeA": `${selecoesArray[0].QtdGols}`, "golsEquipeB": `${selecoesArray[1].QtdGols}`, "golsPenaltyTimeA": `${selecoesArray[0].QtdGolsPenalti}`, "golsPenaltyTimeB": `${selecoesArray[1].QtdGolsPenalti}`});
     
+    xhr.send(data);
+
 }
