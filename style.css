@@ -277,3 +277,17 @@ Main Index
     color: var(--color0);
     background: var(--color3);
 }
+
+.inicializarQuartasOuter {
+    width: 100vw;
+    height: 82vh;
+    display: grid;
+    overflow: scroll;
+    grid-template-columns: auto auto;
+    padding: 5% 20%;
+}
+
+.inicializarQuartas {
+    color: var(--color5);
+    display: contents;
+}

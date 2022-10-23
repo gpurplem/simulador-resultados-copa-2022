@@ -12,7 +12,6 @@ class selecaoObj {
         this.Pontuacao = 0;
         this.Vitorias = 0;
         this.VenceuRodadas = false;
-        this.VenceuOitavas = false;
         this.VenceuQuartas = false;
     }
 }
@@ -146,7 +145,33 @@ function situacaoAtualizada() {
                 classe = 0;
             }
         }
+    } else if (selecoesArray.length == 8) {
+        //Mod HTML: mostrar as seleções em grupos      
+        for (let i = 0, j = 0; i < 8; i++) {
+            dadosHtml +=
+                `<table class='table1' id='table2'>
+            <tr>
+                <th>Adversários</th>
+                <th>Gol</th>
+                <th>Penalti</th>
+                <th>Ponto</th>
+            </tr>            
+            <tr>
+                <td>${selecoesArray[i]['Name']}</td>
+                <td>${selecoesArray[i]['QtdGols']}</td>
+                <td>${selecoesArray[i]['QtdGolsPenalti']}</td>
+                <td>${selecoesArray[i]['Pontuacao']}</td>
+            </tr>
+            <tr>
+                <td>${selecoesArray[++i]['Name']}</td>
+                <td>${selecoesArray[i]['QtdGols']}</td>
+                <td>${selecoesArray[i]['QtdGolsPenalti']}</td>
+                <td>${selecoesArray[i]['Pontuacao']}</td>
+            </tr>`;
+        }
     }
+
+
     return dadosHtml;
 }
 
@@ -156,8 +181,12 @@ function atualizarPontuacao() {
         for (let i = 0; i < 32; i++) {
             selecoesArray[i].Pontuacao = 3 * selecoesArray[i].Vitorias;
         }
-    } else if(selecoesArray.length === 16){
+    } else if (selecoesArray.length === 16) {
         for (let i = 0; i < 16; i++) {
+            selecoesArray[i].Pontuacao = 3 * selecoesArray[i].Vitorias;
+        }
+    } else if (selecoesArray.length === 8) {
+        for (let i = 0; i < 8; i++) {
             selecoesArray[i].Pontuacao = 3 * selecoesArray[i].Vitorias;
         }
     }
@@ -250,14 +279,53 @@ function gerarGols(time1, time2) {
             }
 
             //Próximo time (a oitava muda o padrão de competidores)
-            if(time1 % 2 === 0) {
+            if (time1 % 2 === 0) {
                 time1 = time2 + 1;
                 time2 += 4;
             } else {
                 time1 += 4;
                 time2 = time1 + 1;
             }
-            
+
+
+            //Verifica se houve empate para então chamar gerarPenaltis()
+            qtd1 = 0;
+            qtd2 = 0;
+        }
+    } else if (selecoesArray.length === 8) {
+        while (time1 < 8 && time2 < 8) {
+            qtd1 = gerarInt09();
+            qtd2 = gerarInt09();
+
+            selecoesArray[time1].QtdGols += qtd1;
+            selecoesArray[time2].QtdGols += qtd2;
+
+            //Verificar necessidade de pênalti
+            if (qtd1 === qtd2) {
+                gerarPenaltis(time1, time2);
+            } else {
+                if (qtd1 > qtd2) {
+                    selecoesArray[time1].Vitorias += 1;
+                } else {
+                    selecoesArray[time2].Vitorias += 1;
+                }
+            }
+
+            //Próximo time (a oitava muda o padrão de competidores)
+            if (selecoesArray.length === 8) {
+                time1 += 2;
+                time2 += 2;
+            } else {
+                if (time1 % 2 === 0) {
+                    time1 = time2 + 1;
+                    time2 += 4;
+                } else {
+                    time1 += 4;
+                    time2 = time1 + 1;
+                }
+            }
+
+
 
             //Verifica se houve empate para então chamar gerarPenaltis()
             qtd1 = 0;
@@ -670,6 +738,7 @@ function inicializarOitavas() {
 function simularOitavaA() {
     document.getElementById('main_body').className = 'inicializarOitavasA';
     gerarGols(0, 3);
+    atualizarPontuacao();
     document.getElementById("main_body").innerHTML = situacaoAtualizada();
     modBtnAvancar("simularOitavaB");
 }
@@ -679,5 +748,57 @@ function simularOitavaB() {
     gerarGols(1, 2);
     atualizarPontuacao();
     document.getElementById("main_body").innerHTML = situacaoAtualizada();
-    modBtnAvancar("simularOitavaB");
+    modBtnAvancar("inicializarQuartas");
+}
+
+//Remove times desclassificados, exibe times restantes.
+function inicializarQuartas() {
+
+    //Remove seleções desclassificadas, novo vetor tem times oponentes em ordem
+    let ArrayTmp = new Array(8);
+    let j = 0;
+    for (let i = 0; i <= 12; i += 4) {
+        if (selecoesArray[i].Vitorias == 1) {
+            ArrayTmp[j++] = selecoesArray[i];
+            continue;
+        } else {
+            ArrayTmp[j++] = selecoesArray[i + 3];
+            continue;
+        }
+    }
+    for (let i = 1; i <= 13; i += 4) {
+        if (selecoesArray[i].Vitorias == 1) {
+            ArrayTmp[j++] = selecoesArray[i];
+            continue;
+        } else {
+            ArrayTmp[j++] = selecoesArray[i + 1];
+            continue;
+        }
+    }
+    selecoesArray = new Array(8);
+    selecoesArray = ArrayTmp;
+
+    //Zera pontuações
+    for (let i = 0; i < 8; i++) {
+        selecoesArray[i].QtdGols = 0;
+        selecoesArray[i].QtdGolsPenalti = 0;
+        selecoesArray[i].Pontuacao = 0;
+        selecoesArray[i].Vitorias = 0;
+    }
+
+
+    document.getElementById('main_container').className = "inicializarQuartasOuter";
+    document.getElementById("main_body").innerHTML = situacaoAtualizada();
+    modBtnAvancar("simularQuartas");
+}
+
+function simularQuartas() {
+    gerarGols(0, 1);
+    atualizarPontuacao();
+    document.getElementById("main_body").innerHTML = situacaoAtualizada();
+    modBtnAvancar("inicializarSemifinal");
+}
+
+function inicializarSemifinal(){
+    
 }
