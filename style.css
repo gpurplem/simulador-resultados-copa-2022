@@ -291,3 +291,12 @@ Main Index
     color: var(--color5);
     display: contents;
 }
+
+.inicializarFinalOuter {
+    width: 100vw;
+    height: 82vh;
+    display: grid;
+    overflow: scroll;
+    grid-template-columns: auto;
+    padding: 10% 30%;
+}
