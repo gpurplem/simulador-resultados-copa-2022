@@ -15,17 +15,6 @@ class SelecaoObj {
     }
 }
 
-class Resultado {
-    constructor() {
-        this.equipeA;
-        this.equipeB;
-        this.golsEquipeA;
-        this.golsEquipeB;
-        this.golsPenaltyTimeA;
-        this.golsPenaltyTimeB;
-    }
-}
-
 //Armazena todas as seleções
 let selecoesArray = new Array(32);
 
@@ -40,7 +29,6 @@ function iniciarPrograma() {
 
     inicializarSimulador();
     modBtnAvancar("inicializarGruposAH");
-    //simularRodada() - 1 a 3
 }
 
 /*==================================================
@@ -155,57 +143,9 @@ function situacaoAtualizada() {
                 classe = 0;
             }
         }
-    } else if (selecoesArray.length == 8) {
+    } else {
         //Mod HTML: mostrar as seleções em grupos      
-        for (let i = 0; i < 8; i++) {
-            dadosHtml +=
-                `<table class='table1' id='table2'>
-            <tr>
-                <th>Adversários</th>
-                <th>Gol</th>
-                <th>Penalti</th>
-                <th>Ponto</th>
-            </tr>            
-            <tr>
-                <td>${selecoesArray[i]['Name']}</td>
-                <td>${selecoesArray[i]['QtdGols']}</td>
-                <td>${selecoesArray[i]['QtdGolsPenalti']}</td>
-                <td>${selecoesArray[i]['Pontuacao']}</td>
-            </tr>
-            <tr>
-                <td>${selecoesArray[++i]['Name']}</td>
-                <td>${selecoesArray[i]['QtdGols']}</td>
-                <td>${selecoesArray[i]['QtdGolsPenalti']}</td>
-                <td>${selecoesArray[i]['Pontuacao']}</td>
-            </tr>`;
-        }
-    } else if (selecoesArray.length == 4) {
-        //Mod HTML: mostrar as seleções em grupos      
-        for (let i = 0; i < 4; i++) {
-            dadosHtml +=
-                `<table class='table1' id='table2'>
-            <tr>
-                <th>Adversários</th>
-                <th>Gol</th>
-                <th>Penalti</th>
-                <th>Ponto</th>
-            </tr>            
-            <tr>
-                <td>${selecoesArray[i]['Name']}</td>
-                <td>${selecoesArray[i]['QtdGols']}</td>
-                <td>${selecoesArray[i]['QtdGolsPenalti']}</td>
-                <td>${selecoesArray[i]['Pontuacao']}</td>
-            </tr>
-            <tr>
-                <td>${selecoesArray[++i]['Name']}</td>
-                <td>${selecoesArray[i]['QtdGols']}</td>
-                <td>${selecoesArray[i]['QtdGolsPenalti']}</td>
-                <td>${selecoesArray[i]['Pontuacao']}</td>
-            </tr>`;
-        }
-    } else if (selecoesArray.length == 2) {
-        //Mod HTML: mostrar as seleções em grupos      
-        for (let i = 0; i < 2; i++) {
+        for (let i = 0; i < selecoesArray.length; i++) {
             dadosHtml +=
                 `<table class='table1' id='table2'>
             <tr>
@@ -235,28 +175,9 @@ function situacaoAtualizada() {
 
 //Age sobre vetor global selecoesArray[]
 function atualizarPontuacao() {
-    if (selecoesArray.length === 32) {
-        for (let i = 0; i < 32; i++) {
-            selecoesArray[i].Pontuacao = 3 * selecoesArray[i].Vitorias;
-        }
-    } else if (selecoesArray.length === 16) {
-        for (let i = 0; i < 16; i++) {
-            selecoesArray[i].Pontuacao = 3 * selecoesArray[i].Vitorias;
-        }
-    } else if (selecoesArray.length === 8) {
-        for (let i = 0; i < 8; i++) {
-            selecoesArray[i].Pontuacao = 3 * selecoesArray[i].Vitorias;
-        }
-    } else if (selecoesArray.length === 4) {
-        for (let i = 0; i < 4; i++) {
-            selecoesArray[i].Pontuacao = 3 * selecoesArray[i].Vitorias;
-        }
-    } else if (selecoesArray.length === 2) {
-        for (let i = 0; i < 2; i++) {
-            selecoesArray[i].Pontuacao = 3 * selecoesArray[i].Vitorias;
-        }
+    for (let i = 0; i < selecoesArray.length; i++) {
+        selecoesArray[i].Pontuacao = 3 * selecoesArray[i].Vitorias;
     }
-
 }
 
 //Gera resultados de pênalti entre dois times
@@ -297,121 +218,8 @@ function gerarGols(time1, time2) {
     let qtd1 = 0;
     let qtd2 = 0;
 
-    if (selecoesArray.length === 32) {
-        //Cada passada é uma partida entre 2 times
-        while (time1 < 32 && time2 < 32) {
-            qtd1 = gerarInt09();
-            qtd2 = gerarInt09();
-
-            selecoesArray[time1].QtdGols += qtd1;
-            selecoesArray[time2].QtdGols += qtd2;
-
-            //Verificar necessidade de pênalti
-            if (qtd1 === qtd2) {
-                gerarPenaltis(time1, time2);
-            } else {
-                if (qtd1 > qtd2) {
-                    selecoesArray[time1].Vitorias += 1;
-                } else {
-                    selecoesArray[time2].Vitorias += 1;
-                }
-            }
-
-            //Próximo time
-            time1 += 4;
-            time2 += 4;
-
-            //Verifica se houve empate para então chamar gerarPenaltis()
-            qtd1 = 0;
-            qtd2 = 0;
-        }
-    } else if (selecoesArray.length === 16) {
-        while (time1 < 16 && time2 < 16) {
-            qtd1 = gerarInt09();
-            qtd2 = gerarInt09();
-
-            selecoesArray[time1].QtdGols += qtd1;
-            selecoesArray[time2].QtdGols += qtd2;
-
-            //Verificar necessidade de pênalti
-            if (qtd1 === qtd2) {
-                gerarPenaltis(time1, time2);
-            } else {
-                if (qtd1 > qtd2) {
-                    selecoesArray[time1].Vitorias += 1;
-                } else {
-                    selecoesArray[time2].Vitorias += 1;
-                }
-            }
-
-            //Próximo time (a oitava muda o padrão de escolha de adversários)
-            if (time1 % 2 === 0) {
-                time1 = time2 + 1;
-                time2 += 4;
-            } else {
-                time1 += 4;
-                time2 = time1 + 1;
-            }
-
-            //Verifica se houve empate para então chamar gerarPenaltis()
-            qtd1 = 0;
-            qtd2 = 0;
-        }
-    } else if (selecoesArray.length === 8) {
-        while (time1 < 8 && time2 < 8) {
-            qtd1 = gerarInt09();
-            qtd2 = gerarInt09();
-
-            selecoesArray[time1].QtdGols += qtd1;
-            selecoesArray[time2].QtdGols += qtd2;
-
-            //Verificar necessidade de pênalti
-            if (qtd1 === qtd2) {
-                gerarPenaltis(time1, time2);
-            } else {
-                if (qtd1 > qtd2) {
-                    selecoesArray[time1].Vitorias += 1;
-                } else {
-                    selecoesArray[time2].Vitorias += 1;
-                }
-            }
-
-            //Próximo time
-            time1 += 2;
-            time2 += 2;
-
-            //Verifica se houve empate para então chamar gerarPenaltis()
-            qtd1 = 0;
-            qtd2 = 0;
-        }
-    } else if (selecoesArray.length === 4) {
-        while (time1 < 4 && time2 < 4) {
-            qtd1 = gerarInt09();
-            qtd2 = gerarInt09();
-
-            selecoesArray[time1].QtdGols += qtd1;
-            selecoesArray[time2].QtdGols += qtd2;
-
-            //Verificar necessidade de pênalti
-            if (qtd1 === qtd2) {
-                gerarPenaltis(time1, time2);
-            } else {
-                if (qtd1 > qtd2) {
-                    selecoesArray[time1].Vitorias += 1;
-                } else {
-                    selecoesArray[time2].Vitorias += 1;
-                }
-            }
-
-            //Próximo time
-            time1 += 2;
-            time2 += 2;
-
-            //Verifica se houve empate para então chamar gerarPenaltis()
-            qtd1 = 0;
-            qtd2 = 0;
-        }
-    } else if (selecoesArray.length === 2) {
+    //Cada passada é uma partida entre 2 times
+    while (time1 < selecoesArray.length && time2 < selecoesArray.length) {
         qtd1 = gerarInt09();
         qtd2 = gerarInt09();
 
@@ -427,6 +235,28 @@ function gerarGols(time1, time2) {
             } else {
                 selecoesArray[time2].Vitorias += 1;
             }
+        }
+
+        qtd1 = 0;
+        qtd2 = 0;
+
+        //Próximo time
+        if (selecoesArray.length === 32) {
+            time1 += 4;
+            time2 += 4;
+        } else if (selecoesArray.length === 16) {
+            if (time1 % 2 === 0) {
+                time1 = time2 + 1;
+                time2 += 4;
+            } else {
+                time1 += 4;
+                time2 = time1 + 1;
+            }
+        } else if (selecoesArray.length === 8 || selecoesArray.length === 4) {
+            time1 += 2;
+            time2 += 2;
+        } else if (selecoesArray.length === 2) {
+            break;
         }
     }
 }
@@ -676,6 +506,15 @@ function atualizarVenceuRodadas() {
     }
 }
 
+function zerarPontuacao() {
+    for (let i = 0; i < selecoesArray.length; i++) {
+        selecoesArray[i].QtdGols = 0;
+        selecoesArray[i].QtdGolsPenalti = 0;
+        selecoesArray[i].Pontuacao = 0;
+        selecoesArray[i].Vitorias = 0;
+    }
+}
+
 /*==================================================
 Funções
 ==================================================*/
@@ -819,13 +658,7 @@ function inicializarOitavas() {
     selecoesArray = new Array(16);
     selecoesArray = ArrayTmp;
 
-    //Zera pontuações
-    for (let i = 0; i < 16; i++) {
-        selecoesArray[i].QtdGols = 0;
-        selecoesArray[i].QtdGolsPenalti = 0;
-        selecoesArray[i].Pontuacao = 0;
-        selecoesArray[i].Vitorias = 0;
-    }
+    zerarPontuacao();
 
     document.getElementById("main_body").innerHTML = situacaoAtualizada();
     modBtnAvancar("simularOitavaA");
@@ -849,7 +682,6 @@ function simularOitavaB() {
 
 //Remove times desclassificados, exibe times restantes.
 function inicializarQuartas() {
-
     //Remove seleções desclassificadas, novo vetor tem times oponentes em ordem
     let ArrayTmp = new Array(8);
     let j = 0;
@@ -874,14 +706,7 @@ function inicializarQuartas() {
     selecoesArray = new Array(8);
     selecoesArray = ArrayTmp;
 
-    //Zera pontuações
-    for (let i = 0; i < 8; i++) {
-        selecoesArray[i].QtdGols = 0;
-        selecoesArray[i].QtdGolsPenalti = 0;
-        selecoesArray[i].Pontuacao = 0;
-        selecoesArray[i].Vitorias = 0;
-    }
-
+    zerarPontuacao();
 
     document.getElementById('main_container').className = "inicializarQuartasOuter";
     document.getElementById("main_body").innerHTML = situacaoAtualizada();
@@ -906,13 +731,7 @@ function inicializarSemifinal() {
     selecoesArray = new Array(4);
     selecoesArray = ArrayTmp;
 
-    //Zera pontuações
-    for (let i = 0; i < 4; i++) {
-        selecoesArray[i].QtdGols = 0;
-        selecoesArray[i].QtdGolsPenalti = 0;
-        selecoesArray[i].Pontuacao = 0;
-        selecoesArray[i].Vitorias = 0;
-    }
+    zerarPontuacao();
 
     document.getElementById("main_body").innerHTML = situacaoAtualizada();
     modBtnAvancar("simularSemifinal");
@@ -936,13 +755,7 @@ function inicializarFinal() {
     selecoesArray = new Array(2);
     selecoesArray = ArrayTmp;
 
-    //Zera pontuações
-    for (let i = 0; i < 2; i++) {
-        selecoesArray[i].QtdGols = 0;
-        selecoesArray[i].QtdGolsPenalti = 0;
-        selecoesArray[i].Pontuacao = 0;
-        selecoesArray[i].Vitorias = 0;
-    }
+    zerarPontuacao();
 
     document.getElementById('main_container').className = "inicializarFinalOuter";
     document.getElementById("main_body").innerHTML = situacaoAtualizada();
@@ -954,8 +767,6 @@ function simularFinal() {
     atualizarPontuacao();
     document.getElementById("main_body").innerHTML = situacaoAtualizada();
     document.getElementById('main_body').className = 'simularFinal';
-    let vencedor;
-    let perdedor;
 
     //Exibir ganhador
     if (selecoesArray[0].Vitorias === 1) {
@@ -979,8 +790,18 @@ function simularFinal() {
         }
     };
 
-    var data = JSON.stringify({ "equipeA": `${selecoesArray[0].Token}`, "equipeB": `${selecoesArray[1].Token}`, "golsEquipeA": `${selecoesArray[0].QtdGols}`, "golsEquipeB": `${selecoesArray[1].QtdGols}`, "golsPenaltyTimeA": `${selecoesArray[0].QtdGolsPenalti}`, "golsPenaltyTimeB": `${selecoesArray[1].QtdGolsPenalti}`});
-    
-    xhr.send(data);
+    var data = JSON.stringify({ "equipeA": `${selecoesArray[0].Token}`, "equipeB": `${selecoesArray[1].Token}`, "golsEquipeA": `${selecoesArray[0].QtdGols}`, "golsEquipeB": `${selecoesArray[1].QtdGols}`, "golsPenaltyTimeA": `${selecoesArray[0].QtdGolsPenalti}`, "golsPenaltyTimeB": `${selecoesArray[1].QtdGolsPenalti}` });
 
+    xhr.send(data);
+    modBtnAvancar("encerrar");
+}
+
+function encerrar() {
+    document.getElementById("main").className = "encerrar";
+    modBtnAvancar("reiniciar");
+    document.getElementById("avancar-btn").innerHTML = "REINICIAR";
+}
+
+function reiniciar() {
+    window.location.reload();
 }

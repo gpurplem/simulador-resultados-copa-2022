@@ -310,3 +310,6 @@ Main Index
     background: rgb(255, 247, 0);
 }
 
+.encerrar {
+    filter: blur(1.5px) saturate(0);
+}
